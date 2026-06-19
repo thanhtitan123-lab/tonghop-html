@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hệ thống bài tập</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
   <style>
   body {
-    /* Gradient động hoặc màu sắc hiện đại hơn */
     background: linear-gradient(135deg, #535974 0%, #7c7782 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
@@ -16,8 +17,18 @@
     overflow-x: hidden;
   }
 
-  #menu-wrapper {
+  /* KHUNG ĐĂNG NHẬP */
+  #login-wrapper {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+  }
+
+  /* KHUNG MENU CHÍNH (Ẩn mặc định, hiện sau khi đăng nhập) */
+  #menu-wrapper {
+    display: none; 
     align-items: center;
     justify-content: center;
     height: 100vh;
@@ -29,12 +40,16 @@
     border-radius: 24px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     background: rgba(255, 255, 255, 0.95);
-    padding: 50px 40px;
-    max-width: 450px;
+    padding: 40px;
+    max-width: 450px; /* Độ rộng vừa phải cho khung đăng nhập */
     width: 100%;
     text-align: center;
     transition: transform 0.3s ease;
+  }
 
+  /* Khi đăng nhập thành công, mở rộng chiều rộng hộp menu thành 700px để chứa đủ 2 cột */
+  #menu-wrapper .main-card {
+    max-width: 700px;
   }
 
   h2 {
@@ -45,13 +60,58 @@
 
   p { color: #636e72; margin-bottom: 30px; }
 
-  /* Hiệu ứng cho từng mục bài tập */
+  /* CSS cho Form Đăng Nhập */
+  .form-group {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    font-weight: 600;
+    color: #444;
+  }
+  .form-control {
+    border-radius: 8px;
+    height: 45px;
+    border: 1px solid #ddd;
+  }
+  .btn-login {
+    width: 100%;
+    height: 45px;
+    background: #764ba2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin-top: 10px;
+  }
+  .btn-login:hover {
+    background: #5a3485;
+    color: #fff;
+  }
+  #login-error {
+    color: #e74c3c;
+    margin-top: 15px;
+    font-weight: 600;
+    display: none;
+  }
+
+  /* CẤU TRÚC 2 CỘT CHO PANEL GROUP */
+  .panel-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Chia thành 2 cột đều nhau */
+    gap: 15px; /* Khoảng cách giữa các ô */
+    margin-bottom: 0;
+  }
+
   .panel-default {
     border: 1px solid #eee !important;
     border-radius: 12px !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 0 !important; /* Reset margin cũ */
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     overflow: hidden;
+    height: 100%;
   }
 
   .panel-default:hover {
@@ -64,6 +124,10 @@
     padding: 15px 20px !important;
     background-color: transparent !important;
     transition: background 0.3s;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
   }
 
   .panel-heading:hover {
@@ -76,13 +140,15 @@
     color: #444;
     display: flex;
     align-items: center;
+    text-align: left;
+    width: 100%;
   }
 
-  /* Thêm icon giả bằng CSS hoặc dùng FontAwesome */
   .panel-title::before {
     content: "📁";
     margin-right: 15px;
     font-size: 18px;
+    flex-shrink: 0;
   }
 
   /* NÚT QUAY LẠI */
@@ -120,17 +186,45 @@
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* Tự động chuyển về 1 cột trên giao diện điện thoại nhỏ */
+  @media (max-width: 576px) {
+    .panel-group {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
 </head>
 <body>
+
   <button id="back-btn" onclick="goBack()">← Quay lại Menu</button>
+
+  <div id="login-wrapper">
+    <div class="container main-card">
+      <h2>Đăng Nhập</h2>
+      <p>Vui lòng đăng nhập để xem nội dung bài tập</p>
+      
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="username">Tài khoản:</label>
+          <input type="text" class="form-control" id="username" placeholder="Nhập tài khoản" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Mật khẩu:</label>
+          <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" required>
+        </div>
+        <button type="submit" class="btn btn-login">Đăng nhập</button>
+        <div id="login-error">Tài khoản hoặc mật khẩu không đúng!</div>
+      </form>
+    </div>
+  </div>
 
   <div id="menu-wrapper">
     <div class="container main-card">
       <h2>Danh sách các bài tập</h2>
       <p>Chọn mục bên dưới để xem nội dung</p>                                          
- <!-- Thay thế Dropdown bằng Panel Group -->
+      
       <div class="panel-group">
         
         <div class="panel panel-default">
@@ -169,7 +263,6 @@
           </div>
         </div>
 
-
       </div>
     </div>
   </div>
@@ -177,25 +270,41 @@
   <iframe id="content-frame"></iframe>
 
   <script>
+    // Hàm xử lý logic Đăng nhập
+    function handleLogin(event) {
+      event.preventDefault(); // Ngăn trang bị load lại khi submit form
+      
+      var user = document.getElementById('username').value;
+      var pass = document.getElementById('password').value;
+      var errorMsg = document.getElementById('login-error');
+
+      // Kiểm tra tài khoản & mật khẩu định sẵn
+      if (user === '110124171' && pass === '27102006') {
+        // Ẩn form đăng nhập đi
+        document.getElementById('login-wrapper').style.display = 'none';
+        // Hiển thị Menu chọn bài tập dưới dạng flex công khai
+        document.getElementById('menu-wrapper').style.display = 'flex';
+      } else {
+        // Hiện thông báo lỗi nếu nhập sai
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    // Hàm mở link bài tập vào iframe
     function showPage(url) {
-      // Ẩn menu chính
       document.getElementById('menu-wrapper').style.display = 'none';
-      // Hiện iframe và gán link
       var frame = document.getElementById('content-frame');
       frame.src = url;
       frame.style.display = 'block';
-      // Hiện nút quay lại
       document.getElementById('back-btn').style.display = 'block';
     }
 
+    // Hàm quay lại Menu bài tập
     function goBack() {
-      // Hiện lại menu chính
       document.getElementById('menu-wrapper').style.display = 'flex';
-      // Ẩn iframe và xóa src
       var frame = document.getElementById('content-frame');
       frame.style.display = 'none';
       frame.src = '';
-      // Ẩn nút quay lại
       document.getElementById('back-btn').style.display = 'none';
     }
   </script>
