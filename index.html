@@ -207,11 +207,11 @@
       
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label for="username">Tài khoản:</label>
+          <label for="username">Tài khoản: (Mặc đinh là mã sinh viên)</label>
           <input type="text" class="form-control" id="username" placeholder="Nhập tài khoản" required>
         </div>
         <div class="form-group">
-          <label for="password">Mật khẩu:</label>
+          <label for="password">Mật khẩu: (Mặc định là mã sinh viên)</label>
           <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" required>
         </div>
         <button type="submit" class="btn btn-login">Đăng nhập</button>
@@ -279,7 +279,7 @@
       var errorMsg = document.getElementById('login-error');
 
       // Kiểm tra tài khoản & mật khẩu định sẵn
-      if (user === '110124171' && pass === '27102006') {
+      if (user === '110124171' && pass === '110124171') {
         // Ẩn form đăng nhập đi
         document.getElementById('login-wrapper').style.display = 'none';
         // Hiển thị Menu chọn bài tập dưới dạng flex công khai
